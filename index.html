@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Will you be my Valentine?</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><text y='17'>🤍</text></svg>"
+    />
+    <style>
+      @font-face {
+        font-family: "Steph";
+        src: url("/fonts/steph-font.ttf");
+        font-weight: normal;
+      }
+
+      @font-face {
+        font-family: "Steph";
+        src: url("/fonts/steph-font-bold.ttf");
+        font-weight: bold;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: "Steph", sans-serif;
+        background: linear-gradient(135deg, #ffe6e6 0%, #ff9999 100%);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .container {
+        text-align: center;
+        z-index: 1;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 2rem;
+        border-radius: 20px;
+        backdrop-filter: blur(5px);
+        position: relative;
+      }
+
+      .gif {
+        width: 350px;
+        height: 350px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+      }
+
+      .question {
+        font-size: 40px;
+        margin: 20px;
+        color: #d4145a;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      .buttons {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        position: relative;
+      }
+
+      .btn {
+        padding: 12px 40px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 20px;
+        transition: transform 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 2;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .btn-yes {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      .btn-no {
+        background-color: #ff4d4d;
+        color: white;
+        position: relative;
+        transition: all 0.5s ease-out;
+      }
+
+      .large-yes {
+        width: 300px;
+        height: 300px;
+        font-size: 28px;
+      }
+
+      .heart {
+        position: fixed;
+        width: 20px;
+        height: 20px;
+        background: #ff6b6b;
+        transform: rotate(45deg);
+        opacity: 0;
+        pointer-events: none;
+        will-change: transform, opacity;
+      }
+
+      .heart::before,
+      .heart::after {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #ff6b6b;
+      }
+
+      .heart::before {
+        left: -10px;
+      }
+
+      .heart::after {
+        top: -10px;
+      }
+
+      .music-control {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 10px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 1000;
+        font-size: 24px;
+        backdrop-filter: blur(5px);
+        transition: transform 0.3s ease;
+      }
+
+      .music-control:hover {
+        transform: scale(1.1);
+      }
+
+      .special-text {
+        position: fixed;
+        font-size: 24px;
+        color: #ff4d4d;
+        pointer-events: none;
+        animation: floatUp 3s ease-out forwards;
+        z-index: 1000;
+      }
+
+      @keyframes floatUp {
+        0% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-100px);
+        }
+      }
+
+      .envelope {
+        cursor: pointer;
+        font-size: 40px;
+        margin-top: 20px;
+        transition: transform 0.3s ease;
+      }
+
+      .envelope:hover {
+        transform: scale(1.1);
+      }
+
+      .letter-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .letter-content {
+        background: #fff;
+        padding: 40px;
+        border-radius: 20px;
+        position: relative;
+        max-width: 80%;
+        text-align: center;
+        animation: openLetter 0.5s ease-out;
+      }
+
+      @keyframes openLetter {
+        0% {
+          transform: scale(0.1) rotate(-10deg);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1) rotate(0);
+          opacity: 1;
+        }
+      }
+
+      .letter-text {
+        font-size: 32px;
+        color: #ff4d4d;
+        margin: 20px;
+        font-family: "Brush Script MT", cursive;
+      }
+
+      .close-letter {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+      }
+
+      @keyframes floatHeart {
+        0% {
+          transform: rotate(45deg) translate(0, 0) scale(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.8;
+        }
+        100% {
+          transform: rotate(45deg)
+            translate(
+              calc(var(--translateX) * 1px),
+              calc(var(--translateY) * 1px)
+            )
+            scale(1);
+          opacity: 0;
+        }
+      }
+
+      #movementArea {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80vw;
+        height: 80vh;
+        z-index: 1;
+      }
+      .welcome-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #ffe6e6 0%, #ff9999 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+
+      .welcome-button {
+        padding: 15px 40px;
+        font-size: 24px;
+        background: #ff4d4d;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        margin-top: 20px;
+        animation: pulse 2s infinite;
+      }
+
+      .welcome-button:hover {
+        transform: scale(1.1);
+      }
+
+      .welcome-text {
+        font-size: 32px;
+        color: #d4145a;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      /* Добавляем стиль для скрытия экрана */
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="welcome-screen" id="welcomeScreen">
+      <div class="welcome-text">У меня есть для тебя кое-что особенное ❤️</div>
+      <button class="welcome-button" onclick="startValentine()">
+        Нажми меня
+      </button>
+    </div>
+
+    <div class="music-control hidden" onclick="toggleMusic()" id="musicControl">
+      🔇
+    </div>
+
+    <div id="mainContent">
+      <div id="movementArea"></div>
+      <div class="container">
+        <img
+          src="./assests/lovelovelove.gif"
+          alt="Cute Valentine GIF"
+          class="gif"
+          id="mainGif"
+        />
+        <div class="question" id="mainText">
+          Will you be my Valentine? (˶ᵔ ᵕ ᵔ˶)
+        </div>
+        <div class="buttons">
+          <button class="btn btn-yes" onclick="accepted()">Да</button>
+          <button class="btn btn-no" onclick="moveButton()" id="noBtn">
+            Нет
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="letter-modal" id="letterModal">
+      <div class="letter-content">
+        <span class="close-letter" onclick="closeLetter()">×</span>
+        <div class="letter-text">Я люблю тебя ❤️</div>
+      </div>
+    </div>
+
+    <audio id="bgMusic" preload="auto" loop>
+      <source src="./assests/music.mp3" type="audio/mp3" />
+      <source src="./assets/music.mp3" type="audio/mp3" />
+    </audio>
+    <script>
+      async function startValentine() {
+        try {
+          // Сначала запускаем музыку
+          await music.play();
+          isMusicPlaying = true;
+
+          // Показываем контрол музыки
+          document.getElementById("musicControl").classList.remove("hidden");
+
+          // Скрываем welcome screen
+          document.getElementById("welcomeScreen").classList.add("hidden");
+
+          // Запускаем анимацию сердец
+          startHearts();
+        } catch (error) {
+          console.error("Ошибка при старте:", error);
+          // Если что-то пошло не так, все равно показываем основной контент
+          document.getElementById("welcomeScreen").classList.add("hidden");
+        }
+      }
+
+      // Обновляем остальной JavaScript код
+      const music = document.getElementById("bgMusic");
+      let isMusicPlaying = false;
+
+      // Устанавливаем начальную громкость
+      music.volume = 0.3;
+
+      function toggleMusic() {
+        if (isMusicPlaying) {
+          music.pause();
+          document.getElementById("musicControl").innerHTML = "🎵";
+        } else {
+          music.play();
+          document.getElementById("musicControl").innerHTML = "🔇";
+        }
+        isMusicPlaying = !isMusicPlaying;
+      }
+      const noBtnTexts = [
+        "Ты уверена?",
+        "Правда правда?",
+        "Подумай ещё раз!",
+        "Может всё-таки да?",
+        "Последний шанс!",
+        "Самый-самый последний шанс.",
+        "........",
+      ];
+
+      let noCount = 0;
+      const noBtn = document.getElementById("noBtn");
+      const yesBtn = document.querySelector(".btn-yes");
+      const movementArea = document.getElementById("movementArea");
+      const mainGif = document.getElementById("mainGif");
+      let heartInterval;
+
+      function getRandomDirection() {
+        // Генерируем случайный угол в радианах
+        const angle = Math.random() * 2 * Math.PI;
+        // Определяем дистанцию (можно настроить под необходимую дальность полета)
+        const distance = Math.random() * 500 + 500;
+
+        return {
+          x: Math.cos(angle) * distance,
+          y: Math.sin(angle) * distance,
+        };
+      }
+
+      function createHeart() {
+        const heart = document.createElement("div");
+        heart.className = "heart";
+
+        // Случайная стартовая позиция по всему экрану
+        const startX = Math.random() * window.innerWidth;
+        const startY = Math.random() * window.innerHeight;
+
+        heart.style.left = `${startX}px`;
+        heart.style.top = `${startY}px`;
+
+        // Получаем случайное направление движения
+        const direction = getRandomDirection();
+        heart.style.setProperty("--translateX", direction.x);
+        heart.style.setProperty("--translateY", direction.y);
+
+        // Настраиваем анимацию
+        const duration = Math.random() * 5 + 10;
+        heart.style.animation = `floatHeart ${duration}s linear`;
+
+        // Случайный размер
+        const scale = Math.random() * 0.5 + 0.5;
+        heart.style.scale = scale;
+
+        document.body.appendChild(heart);
+
+        // Удаляем сердечко после завершения анимации
+        heart.addEventListener("animationend", () => {
+          heart.remove();
+        });
+      }
+
+      function startHearts() {
+        // Очищаем предыдущий интервал
+        if (heartInterval) {
+          clearInterval(heartInterval);
+        }
+
+        // Удаляем все существующие сердечки
+        const hearts = document.querySelectorAll(".heart");
+        hearts.forEach((heart) => heart.remove());
+
+        // Создаем начальные сердечки
+        for (let i = 0; i < 20; i++) {
+          setTimeout(() => createHeart(), Math.random() * 3000);
+        }
+
+        // Запускаем новый интервал
+        heartInterval = setInterval(createHeart, 300);
+      }
+
+      // Запускаем сердечки при загрузке страницы
+      startHearts();
+
+      // Перезапускаем анимацию при изменении размера окна
+      let resizeTimeout;
+      window.addEventListener("resize", () => {
+        // Используем debounce для предотвращения частых перезапусков
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(startHearts, 250);
+      });
+
+      function moveButton() {
+        noCount++;
+
+        if (noCount === 1) {
+          mainGif.src = "./assests/sad.gif";
+          document.body.appendChild(noBtn);
+          noBtn.style.position = "fixed";
+        }
+
+        if (noCount >= 8) {
+          noBtn.style.display = "none";
+          yesBtn.classList.add("large-yes");
+          return;
+        }
+
+        noBtn.textContent = noBtnTexts[noCount - 1];
+
+        const areaRect = movementArea.getBoundingClientRect();
+        const btnRect = noBtn.getBoundingClientRect();
+
+        const maxX = areaRect.width - btnRect.width;
+        const maxY = areaRect.height - btnRect.height;
+        const newX = areaRect.left + Math.random() * maxX;
+        const newY = areaRect.top + Math.random() * maxY;
+
+        noBtn.style.left = `${newX}px`;
+        noBtn.style.top = `${newY}px`;
+
+        setTimeout(() => {
+          noBtn.style.transition = "none";
+        }, 500);
+      }
+
+      function openLetter() {
+        document.getElementById("letterModal").style.display = "flex";
+      }
+
+      function closeLetter() {
+        document.getElementById("letterModal").style.display = "none";
+      }
+
+      function accepted() {
+        // Instead of replacing entire body innerHTML, we just replace the main content
+        document.getElementById("mainContent").innerHTML = `
+          <div class="container">
+            <img src="/assests/yay.gif" alt="Happy Valentine GIF" class="gif">
+            <div class="question">
+              Thanks for being my Valentine! ⸜(｡˃ ᵕ ˂ )⸝♡
+            </div>
+            <div class="envelope" onclick="openLetter()">✉️</div>
+          </div>
+        `;
+
+        // Keep the letter modal in the DOM but update its content
+        document.getElementById("letterModal").innerHTML = `
+          <div class="letter-content">
+            <span class="close-letter" onclick="closeLetter()">×</span>
+            <div class="letter-text">Я люблю тебя, Лили 🤍</div>
+          </div>
+        `;
+
+        // Continue the hearts animation
+        startHearts();
+
+        // Music control remains visible and functional
+        document.getElementById("musicControl").style.display = "block";
+      }
+    </script>
+  </body>
+</html>
