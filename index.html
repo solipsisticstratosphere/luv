@@ -304,7 +304,6 @@
         }
       }
 
-      /* Добавляем стиль для скрытия экрана */
       .hidden {
         display: none !important;
       }
@@ -357,30 +356,24 @@
     <script>
       async function startValentine() {
         try {
-          // Сначала запускаем музыку
           await music.play();
           isMusicPlaying = true;
 
-          // Показываем контрол музыки
           document.getElementById("musicControl").classList.remove("hidden");
 
-          // Скрываем welcome screen
           document.getElementById("welcomeScreen").classList.add("hidden");
 
-          // Запускаем анимацию сердец
           startHearts();
         } catch (error) {
           console.error("Ошибка при старте:", error);
-          // Если что-то пошло не так, все равно показываем основной контент
+
           document.getElementById("welcomeScreen").classList.add("hidden");
         }
       }
 
-      // Обновляем остальной JavaScript код
       const music = document.getElementById("bgMusic");
       let isMusicPlaying = false;
 
-      // Устанавливаем начальную громкость
       music.volume = 0.3;
 
       function toggleMusic() {
@@ -411,9 +404,8 @@
       let heartInterval;
 
       function getRandomDirection() {
-        // Генерируем случайный угол в радианах
         const angle = Math.random() * 2 * Math.PI;
-        // Определяем дистанцию (можно настроить под необходимую дальность полета)
+
         const distance = Math.random() * 500 + 500;
 
         return {
@@ -426,60 +418,48 @@
         const heart = document.createElement("div");
         heart.className = "heart";
 
-        // Случайная стартовая позиция по всему экрану
         const startX = Math.random() * window.innerWidth;
         const startY = Math.random() * window.innerHeight;
 
         heart.style.left = `${startX}px`;
         heart.style.top = `${startY}px`;
 
-        // Получаем случайное направление движения
         const direction = getRandomDirection();
         heart.style.setProperty("--translateX", direction.x);
         heart.style.setProperty("--translateY", direction.y);
 
-        // Настраиваем анимацию
         const duration = Math.random() * 5 + 10;
         heart.style.animation = `floatHeart ${duration}s linear`;
 
-        // Случайный размер
         const scale = Math.random() * 0.5 + 0.5;
         heart.style.scale = scale;
 
         document.body.appendChild(heart);
 
-        // Удаляем сердечко после завершения анимации
         heart.addEventListener("animationend", () => {
           heart.remove();
         });
       }
 
       function startHearts() {
-        // Очищаем предыдущий интервал
         if (heartInterval) {
           clearInterval(heartInterval);
         }
 
-        // Удаляем все существующие сердечки
         const hearts = document.querySelectorAll(".heart");
         hearts.forEach((heart) => heart.remove());
 
-        // Создаем начальные сердечки
         for (let i = 0; i < 20; i++) {
           setTimeout(() => createHeart(), Math.random() * 3000);
         }
 
-        // Запускаем новый интервал
         heartInterval = setInterval(createHeart, 300);
       }
 
-      // Запускаем сердечки при загрузке страницы
       startHearts();
 
-      // Перезапускаем анимацию при изменении размера окна
       let resizeTimeout;
       window.addEventListener("resize", () => {
-        // Используем debounce для предотвращения частых перезапусков
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(startHearts, 250);
       });
@@ -526,7 +506,6 @@
       }
 
       function accepted() {
-        // Instead of replacing entire body innerHTML, we just replace the main content
         document.getElementById("mainContent").innerHTML = `
           <div class="container">
             <img src="/assests/yay.gif" alt="Happy Valentine GIF" class="gif">
@@ -537,7 +516,6 @@
           </div>
         `;
 
-        // Keep the letter modal in the DOM but update its content
         document.getElementById("letterModal").innerHTML = `
           <div class="letter-content">
             <span class="close-letter" onclick="closeLetter()">×</span>
@@ -545,10 +523,8 @@
           </div>
         `;
 
-        // Continue the hearts animation
         startHearts();
 
-        // Music control remains visible and functional
         document.getElementById("musicControl").style.display = "block";
       }
     </script>
